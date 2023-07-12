@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:to_do_app/widgets/ActionButton.dart';
+import 'package:to_do_app/widgets/NoteListWidget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -31,7 +32,7 @@ class MainLayout extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Other widgets
+            NoteListWidget(),
             ActionButton(),
           ],
         ),

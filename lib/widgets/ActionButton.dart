@@ -31,10 +31,7 @@ class _ActionButtonState extends State<ActionButton> {
           height: 75,
           child: Stack(
               children: <Widget>[
-                Positioned(
-                    top: 0,
-                    left: 0,
-                    child: Container(
+                    Container(
                         width: 75,
                         height: 75,
                         decoration: BoxDecoration(
@@ -50,8 +47,8 @@ class _ActionButtonState extends State<ActionButton> {
                           ),
                           borderRadius : BorderRadius.all(Radius.elliptical(75, 75)),
                         )
-                    )
-                ),Positioned(
+                    ),
+               Positioned(
                     top: 11,
                     left: 10,
                     child: Container(
