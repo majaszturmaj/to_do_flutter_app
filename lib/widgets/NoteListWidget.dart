@@ -5,6 +5,9 @@ import 'package:flutter/services.dart';
 
 import '../classes/Note.dart';
 
+String newNoteTitle = '';
+String newNoteText = '';
+
 class NoteListWidget extends StatefulWidget {
   @override
   _NoteListWidgetState createState() => _NoteListWidgetState();
@@ -13,8 +16,7 @@ class NoteListWidget extends StatefulWidget {
 class _NoteListWidgetState extends State<NoteListWidget> {
   List _notes = [];
   bool isAddingNote = false;
-  String newNoteTitle = '';
-  String newNoteText = '';
+
   NoteManager noteManager = new NoteManager("lib/assets/notes.json");
 
   // Fetch content from the json file
@@ -62,7 +64,11 @@ class _NoteListWidgetState extends State<NoteListWidget> {
     }
   }
 
-
+  void onNoteAdded(String title, String text) {
+    setState(() {
+      _notes.add(Note(title, text));
+    });
+  }
 
   @override
   void initState() {
@@ -71,7 +77,6 @@ class _NoteListWidgetState extends State<NoteListWidget> {
     readJson();
   }
 
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -79,127 +84,133 @@ class _NoteListWidgetState extends State<NoteListWidget> {
         padding: const EdgeInsets.all(25),
         child: Column(
           children: [
-            if (isAddingNote)
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 10),
-                child: Column(
-                  children: [
-                    TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          newNoteTitle = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Title',
+            Expanded(
+              child: _notes.isNotEmpty
+                  ? ListView.builder(
+                itemCount: _notes.length,
+                itemBuilder: (context, index) {
+                  final note = _notes[index];
+
+                  return Dismissible(
+                    key: UniqueKey(),
+                    onDismissed: (direction) {
+                      setState(() {
+                        _notes.removeAt(index);
+                      });
+                    },
+                    background: Container(
+                      color: Colors.red,
+                      alignment: Alignment.centerLeft,
+                      padding: EdgeInsets.only(left: 16),
+                      child: Icon(Icons.delete, color: Colors.white),
+                    ),
+                    child: Card(
+                      margin: const EdgeInsets.all(10),
+                      color: Colors.amber.shade100,
+                      child: ListTile(
+                        title: Text(note.title),
+                        subtitle: Text(note.text),
                       ),
                     ),
-                    TextField(
-                      onChanged: (value) {
-                        setState(() {
-                          newNoteText = value;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        labelText: 'Text',
+                  );
+                },
+              )
+                  : Container(),
+            ),
+            if (isAddingNote)
+              Container(
+                width: 315,
+                height: 510,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(60),
+                  color: Color.fromRGBO(217, 217, 217, 0.07800000160932541),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25, top: 22),
+                      child: Text(
+                        'Title',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontFamily: 'Roboto Mono',
+                          fontSize: 28,
+                          fontWeight: FontWeight.normal,
+                          height: 1,
+                        ),
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25, top: 10, right: 25),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          setState(() {
+                            newNoteTitle = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Start writing your note...',
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Roboto Mono',
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            height: 1,
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(101, 151, 201, 1),
+                              width: 1,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25, right: 25),
+                      child: TextFormField(
+                        onChanged: (value) {
+                          setState(() {
+                            newNoteText = value;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          labelText: 'Text',
+                          labelStyle: TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Roboto Mono',
+                            fontSize: 16,
+                            fontWeight: FontWeight.normal,
+                            height: 1,
+                          ),
+                          enabledBorder: UnderlineInputBorder(
+                            borderSide: BorderSide(
+                              color: Color.fromRGBO(101, 151, 201, 1),
+                              width: 1,
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-            if (_notes.isNotEmpty)
-              Expanded(
-                child: ListView.builder(
-                  itemCount: _notes.length,
-                  itemBuilder: (context, index) {
-                    final note = _notes[index];
-
-                    return Dismissible(
-                      key: UniqueKey(),
-                      onDismissed: (direction) {
-                        setState(() {
-                          noteManager.deleteNote(index);
-                          _notes.removeAt(index);
-                        });
-                      },
-                      background: Container(
-                        color: Colors.red,
-                        alignment: Alignment.centerLeft,
-                        padding: EdgeInsets.only(left: 16),
-                        child: Icon(Icons.delete, color: Colors.white),
-                      ),
-                      child: Card(
-                        margin: const EdgeInsets.all(10),
-                        color: Colors.amber.shade100,
-                        child: ListTile(
-                          title: Text(note.title),
-                          subtitle: Text(note.text),
-                        ),
-                      ),
-                    );
+            Align(
+              alignment: Alignment.bottomCenter,
+              child: Padding(
+                padding: const EdgeInsets.only(bottom: 20),
+                child: ActionButton(
+                  isOnNoteEdit: isAddingNote,
+                  onNoteAdded: (isNoteAdded) {
+                    if (isNoteAdded) {
+                      onNoteAdded(newNoteTitle, newNoteText);
+                      addNote();
+                    } else {
+                      toggleAddingNote();
+                    }
                   },
-                ),
-              )
-            else
-              Container(),
-            GestureDetector(
-              onTap: () {
-                if (isAddingNote) {
-                  addNote();
-                } else {
-                  toggleAddingNote();
-                }
-              },
-              child: Container(
-                width: 75,
-                height: 75,
-                child: Stack(
-                  children: <Widget>[
-                    Container(
-                      width: 75,
-                      height: 75,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Color.fromRGBO(163, 154, 196, 0.8999999761581421),
-                            offset: Offset(1, 1),
-                            blurRadius: 3,
-                          ),
-                        ],
-                        gradient: LinearGradient(
-                          begin: Alignment(0.5, 0.5),
-                          end: Alignment(-0.5, 0.5),
-                          colors: [
-                            Color.fromRGBO(45, 110, 126, 1),
-                            Color.fromRGBO(10, 83, 160, 1),
-                          ],
-                        ),
-                        borderRadius: BorderRadius.all(Radius.elliptical(75, 75)),
-                      ),
-                    ),
-                    Positioned(
-                      top: 11,
-                      left: 10,
-                      child: Container(
-                        width: 54,
-                        height: 54,
-                        decoration: BoxDecoration(
-                          image: DecorationImage(
-                            image: AssetImage(
-                              isAddingNote
-                                  ? 'lib/assets/images/save.png'
-                                  : 'lib/assets/images/plusmath.png',
-                            ),
-                            fit: BoxFit.fitWidth,
-                            colorFilter: ColorFilter.mode(
-                              Colors.white.withOpacity(0.8),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
                 ),
               ),
             ),
@@ -208,112 +219,83 @@ class _NoteListWidgetState extends State<NoteListWidget> {
       ),
     );
   }
-
-
-
 }
 
 class ActionButton extends StatefulWidget {
+  final bool isOnNoteEdit;
+  final Function(bool) onNoteAdded;
+
+  ActionButton({required this.isOnNoteEdit, required this.onNoteAdded});
+
   @override
   _ActionButtonState createState() => _ActionButtonState();
 }
 
 class _ActionButtonState extends State<ActionButton> {
-  bool isOnNoteEdit = false;
-
-  void toggleButtonState() {
-    setState(() {
-      isOnNoteEdit = !isOnNoteEdit;
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        if (isOnNoteEdit) {
-          // Perform action for onNoteEdit state
-          print('Save button clicked!');
+        if (widget.isOnNoteEdit) {
+          // Dodaj nową notatkę tylko w trybie edycji
+          widget.onNoteAdded(newNoteTitle.isNotEmpty && newNoteText.isNotEmpty);;
         } else {
-          // Perform action for onMain state
-          print('Main button clicked!');
+          // Przełącz tryb edycji
+          widget.onNoteAdded(false);
         }
       },
       child: Container(
-          width: 75,
-          height: 75,
-          child: Stack(
-              children: <Widget>[
-                Container(
-                    width: 75,
-                    height: 75,
-                    decoration: BoxDecoration(
-                      boxShadow : [BoxShadow(
-                          color: Color.fromRGBO(163, 154, 196, 0.8999999761581421),
-                          offset: Offset(1,1),
-                          blurRadius: 3
-                      )],
-                      gradient : LinearGradient(
-                          begin: Alignment(0.5,0.5),
-                          end: Alignment(-0.5,0.5),
-                          colors: [Color.fromRGBO(45, 110, 126, 1),Color.fromRGBO(10, 83, 160, 1)]
-                      ),
-                      borderRadius : BorderRadius.all(Radius.elliptical(75, 75)),
-                    )
+        width: 75,
+        height: 75,
+        child: Stack(
+          children: <Widget>[
+            Container(
+              width: 75,
+              height: 75,
+              decoration: BoxDecoration(
+                boxShadow: [
+                  BoxShadow(
+                    color: Color.fromRGBO(163, 154, 196, 0.8999999761581421),
+                    offset: Offset(1, 1),
+                    blurRadius: 3,
+                  ),
+                ],
+                gradient: LinearGradient(
+                  begin: Alignment(0.5, 0.5),
+                  end: Alignment(-0.5, 0.5),
+                  colors: [
+                    Color.fromRGBO(45, 110, 126, 1),
+                    Color.fromRGBO(10, 83, 160, 1),
+                  ],
                 ),
-                Positioned(
-                    top: 11,
-                    left: 10,
-                    child: Container(
-                        width: 54,
-                        height: 54,
-                        decoration: BoxDecoration(
-                          image : DecorationImage(
-                            image: AssetImage(
-                              isOnNoteEdit ? 'lib/assets/images/save.png' : 'lib/assets/images/plusmath.png',
-                            ),
-                            fit: BoxFit.fitWidth,
-                            colorFilter: ColorFilter.mode(Colors.white.withOpacity(0.8),
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                        )
-                    )
+                borderRadius: BorderRadius.all(Radius.elliptical(75, 75)),
+              ),
+            ),
+            Positioned(
+              top: 11,
+              left: 10,
+              child: Container(
+                width: 54,
+                height: 54,
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage(
+                      widget.isOnNoteEdit
+                          ? 'lib/assets/images/save.png'
+                          : 'lib/assets/images/plusmath.png',
+                    ),
+                    fit: BoxFit.fitWidth,
+                    colorFilter: ColorFilter.mode(
+                      Colors.white.withOpacity(0.8),
+                      BlendMode.srcIn,
+                    ),
+                  ),
                 ),
-              ]
-          )
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
 }
-  // @override
-  // Widget build(BuildContext context) {
-  //   List<Note> notes = noteManager.notes;
-  //
-  //   if (notes.isEmpty) {
-  //     return Center(
-  //       child: Text(
-  //         'No notes here: add one by clicking "+" button',
-  //         style: TextStyle(fontSize: 18.0),
-  //       ),
-  //     );
-  //   }
-  //
-  //   return ListView.builder(
-  //     itemCount: notes.length,
-  //     itemBuilder: (context, index) {
-  //       final note = notes[index];
-  //
-  //       return Container(
-  //         margin: EdgeInsets.symmetric(vertical: 8.0),
-  //         padding: EdgeInsets.all(16.0),
-  //         decoration: BoxDecoration(
-  //           color: Colors.grey[200],
-  //           borderRadius: BorderRadius.circular(8.0),
-  //         ),
-  //         child: Text(note.title),
-  //       );
-  //     },
-  //   );
-  // }
-

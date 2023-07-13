@@ -32,7 +32,7 @@ class MainLayout extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             NoteListWidget(),
-            ActionButton(),
+            //ActionButton(),
           ],
         ),
       ),
