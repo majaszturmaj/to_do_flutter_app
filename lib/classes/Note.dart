@@ -3,13 +3,13 @@ import 'dart:io';
 import 'package:flutter/services.dart' show rootBundle;
 
 class Note {
-  String title;
-  String text;
+  String title = '';
+  String text = '';
 
-  Note({
-    required this.title,
-    required this.text,
-  });
+  Note(String title, String text) {
+    this.title = title;
+    this.text = text;
+  }
 
   Map<String, dynamic> toJson() {
     return {
@@ -20,8 +20,8 @@ class Note {
 
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
-      title: json['title'],
-      text: json['text'],
+      json['title'] as String,
+      json['text'] as String,
     );
   }
 }
@@ -35,7 +35,7 @@ class NoteManager {
   }
 
   void addNote(String title, String text) {
-    Note note = Note(title: title, text: text);
+    Note note = Note(title, text);
     notes.add(note);
     saveNotesToFile();
   }
@@ -47,11 +47,17 @@ class NoteManager {
     }
   }
 
-  void saveNotesToFile() {
-    File file = File(fileName);
-    List<Map<String, dynamic>> jsonList = notes.map((note) => note.toJson()).toList();
-    String jsonString = jsonEncode(jsonList);
-    file.writeAsStringSync(jsonString);
+  Future<bool> saveNotesToFile() async {
+    try {
+      File file = File(fileName);
+      List<Map<String, dynamic>> jsonList = notes.map((note) => note.toJson()).toList();
+      String jsonString = jsonEncode(jsonList);
+      await file.writeAsString(jsonString);
+      return true; // Zwracamy true, jeśli zapis do pliku był udany
+    } catch (e) {
+      print('Błąd podczas zapisywania notatek do pliku: $e');
+      return false; // Zwracamy false w przypadku błędu zapisu
+    }
   }
 
   void loadNotesFromFile() {
@@ -61,17 +67,12 @@ class NoteManager {
       return;
     }
 
-    dynamic jsonList = readJson();
-    notes = jsonList.map((json) => Note.fromJson(json)).toList();
+    String jsonString = file.readAsStringSync();
+    List<dynamic> jsonList = jsonDecode(jsonString);
+    List<Note> loadedNotes = jsonList.map((json) => Note.fromJson(json)).toList();
+
+    if (loadedNotes.isNotEmpty) {
+      notes = loadedNotes;
+    }
   }
-
-
-  Future<dynamic> readJson() async {        // dowiedzieć się dlaczego środowisko podsunęło dynamic
-    final String response =
-    await rootBundle.loadString('lib/assets/notes.json');
-    final data = await json.decode(response);
-    return data;
-    // ...
-  }
-
 }
