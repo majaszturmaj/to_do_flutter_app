@@ -79,10 +79,6 @@ class _NoteListWidgetState extends State<NoteListWidget> {
         padding: const EdgeInsets.all(25),
         child: Column(
           children: [
-            ElevatedButton(
-              onPressed: readJson,
-              child: const Text('Load Data'),
-            ),
             if (isAddingNote)
               Container(
                 margin: const EdgeInsets.symmetric(vertical: 10),
