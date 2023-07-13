@@ -21,7 +21,8 @@ class _NoteListWidgetState extends State<NoteListWidget> {
 
   // Fetch content from the json file
   Future<void> readJson() async {
-    final String response = await rootBundle.loadString('lib/assets/notes.json');
+    final String response = await rootBundle.loadString(
+        'lib/assets/notes.json');
     final data = await json.decode(response);
 
     if (data is List) {
@@ -29,7 +30,8 @@ class _NoteListWidgetState extends State<NoteListWidget> {
         _notes = data.map((json) => Note.fromJson(json)).toList();
       });
     } else {
-      print('Nieprawidłowy format danych JSON. Oczekiwano listy obiektów "notes".');
+      print(
+          'Nieprawidłowy format danych JSON. Oczekiwano listy obiektów "notes".');
     }
   }
 
@@ -41,7 +43,8 @@ class _NoteListWidgetState extends State<NoteListWidget> {
 
   void addNote() {
     if (newNoteTitle.isNotEmpty && newNoteText.isNotEmpty) {
-      noteManager.addNote(newNoteTitle, newNoteText); // Dodaj nową notatkę do listy w NoteManager
+      noteManager.addNote(newNoteTitle,
+          newNoteText); // Dodaj nową notatkę do listy w NoteManager
 
       // Zapisz notatki do pliku JSON
       noteManager.saveNotesToFile().then((success) {
@@ -85,118 +88,126 @@ class _NoteListWidgetState extends State<NoteListWidget> {
         child: Column(
           children: [
             Expanded(
-              child: _notes.isNotEmpty
-                  ? ListView.builder(
-                itemCount: _notes.length,
-                itemBuilder: (context, index) {
-                  final note = _notes[index];
+              child: Stack(
+                children: [
+                  ListView.builder(
+                    itemCount: _notes.length,
+                    itemBuilder: (context, index) {
+                      final note = _notes[index];
 
-                  return Dismissible(
-                    key: UniqueKey(),
-                    onDismissed: (direction) {
-                      setState(() {
-                        _notes.removeAt(index);
-                      });
+                      return Dismissible(
+                        key: UniqueKey(),
+                        onDismissed: (direction) {
+                          setState(() {
+                            _notes.removeAt(index);
+                          });
+                        },
+                        background: Container(
+                          color: Colors.red,
+                          alignment: Alignment.centerLeft,
+                          padding: EdgeInsets.only(left: 16),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                        child: Card(
+                          margin: const EdgeInsets.all(10),
+                          color: Colors.amber.shade100,
+                          child: ListTile(
+                            title: Text(note.title),
+                            subtitle: Text(note.text),
+                          ),
+                        ),
+                      );
                     },
-                    background: Container(
-                      color: Colors.red,
-                      alignment: Alignment.centerLeft,
-                      padding: EdgeInsets.only(left: 16),
-                      child: Icon(Icons.delete, color: Colors.white),
-                    ),
-                    child: Card(
-                      margin: const EdgeInsets.all(10),
-                      color: Colors.amber.shade100,
-                      child: ListTile(
-                        title: Text(note.title),
-                        subtitle: Text(note.text),
-                      ),
-                    ),
-                  );
-                },
-              )
-                  : Container(),
-            ),
-            if (isAddingNote)
-              Container(
-                width: 315,
-                height: 510,
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(60),
-                  color: Color.fromRGBO(217, 217, 217, 0.07800000160932541),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25, top: 22),
-                      child: Text(
-                        'Title',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontFamily: 'Roboto Mono',
-                          fontSize: 28,
-                          fontWeight: FontWeight.normal,
-                          height: 1,
+                  ),
+                  if (isAddingNote)
+                    Align(
+                      alignment: Alignment.center,
+                      child: Container(
+                        width: 315,
+                        height: 510,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(60),
+                          color: Color.fromRGBO(
+                              217, 217, 217, 0.07800000160932541),
                         ),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25, top: 10, right: 25),
-                      child: TextFormField(
-                        onChanged: (value) {
-                          setState(() {
-                            newNoteTitle = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Start writing your note...',
-                          labelStyle: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Roboto Mono',
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            height: 1,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(101, 151, 201, 1),
-                              width: 1,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 25, top: 22),
+                              child: Text(
+                                'Title',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontFamily: 'Roboto Mono',
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.normal,
+                                  height: 1,
+                                ),
+                              ),
                             ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 25, right: 25),
-                      child: TextFormField(
-                        onChanged: (value) {
-                          setState(() {
-                            newNoteText = value;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Text',
-                          labelStyle: TextStyle(
-                            color: Colors.white,
-                            fontFamily: 'Roboto Mono',
-                            fontSize: 16,
-                            fontWeight: FontWeight.normal,
-                            height: 1,
-                          ),
-                          enabledBorder: UnderlineInputBorder(
-                            borderSide: BorderSide(
-                              color: Color.fromRGBO(101, 151, 201, 1),
-                              width: 1,
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 25, top: 10, right: 25),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    newNoteTitle = value;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Start writing your note...',
+                                  labelStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Roboto Mono',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1,
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color.fromRGBO(101, 151, 201, 1),
+                                      width: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                          ),
+                            SizedBox(height: 20),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                  left: 25, right: 25),
+                              child: TextFormField(
+                                onChanged: (value) {
+                                  setState(() {
+                                    newNoteText = value;
+                                  });
+                                },
+                                decoration: InputDecoration(
+                                  labelText: 'Text',
+                                  labelStyle: TextStyle(
+                                    color: Colors.white,
+                                    fontFamily: 'Roboto Mono',
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.normal,
+                                    height: 1,
+                                  ),
+                                  enabledBorder: UnderlineInputBorder(
+                                    borderSide: BorderSide(
+                                      color: Color.fromRGBO(101, 151, 201, 1),
+                                      width: 1,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                ],
               ),
+            ),
             Align(
               alignment: Alignment.bottomCenter,
               child: Padding(
