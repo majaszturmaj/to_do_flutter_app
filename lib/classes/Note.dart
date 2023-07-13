@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/services.dart' show rootBundle;
 
 class Note {
   String title;
@@ -55,10 +56,22 @@ class NoteManager {
 
   void loadNotesFromFile() {
     File file = File(fileName);
-    if (file.existsSync()) {
-      String jsonString = file.readAsStringSync();
-      List<dynamic> jsonList = jsonDecode(jsonString);
-      notes = jsonList.map((json) => Note.fromJson(json)).toList();
+    if (!file.existsSync()) {
+      print('Plik $fileName nie istnieje.');
+      return;
     }
+
+    dynamic jsonList = readJson();
+    notes = jsonList.map((json) => Note.fromJson(json)).toList();
   }
+
+
+  Future<dynamic> readJson() async {        // dowiedzieć się dlaczego środowisko podsunęło dynamic
+    final String response =
+    await rootBundle.loadString('lib/assets/notes.json');
+    final data = await json.decode(response);
+    return data;
+    // ...
+  }
+
 }
