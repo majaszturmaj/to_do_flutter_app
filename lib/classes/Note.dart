@@ -69,10 +69,6 @@ class NoteManager {
 
     String jsonString = file.readAsStringSync();
     List<dynamic> jsonList = jsonDecode(jsonString);
-    List<Note> loadedNotes = jsonList.map((json) => Note.fromJson(json)).toList();
-
-    if (loadedNotes.isNotEmpty) {
-      notes = loadedNotes;
-    }
+    notes = jsonList.map((json) => Note.fromJson(json)).toList();
   }
 }
