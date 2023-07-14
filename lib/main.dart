@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:glassmorphism/glassmorphism.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 
-import '../classes/Note.dart';
+import '../classes/NoteManager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -23,7 +22,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: MainLayout(),
+      home: const MainLayout(),
     );
   }
 }
@@ -34,6 +33,8 @@ String newNoteTitle = '';
 String newNoteText = '';
 
 class MainLayout extends StatefulWidget {
+  const MainLayout({super.key});
+
   @override
   _MainLayoutState createState() => _MainLayoutState();
 }
@@ -42,7 +43,7 @@ class _MainLayoutState extends State<MainLayout> {
   List _notes = [];
   bool isAddingNote = false;
 
-  NoteManager noteManager = new NoteManager("lib/assets/notes.json");
+  NoteManager noteManager = NoteManager("lib/assets/notes.json");
 
   // Fetch content from the json file
   Future<void> readJson() async {
@@ -55,8 +56,8 @@ class _MainLayoutState extends State<MainLayout> {
         _notes = data.map((json) => Note.fromJson(json)).toList();
       });
     } else {
-      print(
-          'Nieprawidłowy format danych JSON. Oczekiwano listy obiektów "notes".');
+      // print(
+      //     'Nieprawidłowy format danych JSON. Oczekiwano listy obiektów "notes".');
     }
   }
 
@@ -74,7 +75,7 @@ class _MainLayoutState extends State<MainLayout> {
       // Zapisz notatki do pliku JSON
       noteManager.saveNotesToFile().then((success) {
         if (success) {
-          print('Dodano nową notatkę: Tytuł=$newNoteTitle, Treść=$newNoteText');
+          // print('Dodano nową notatkę: Tytuł=$newNoteTitle, Treść=$newNoteText');
 
           // Wyczyść zmienne przechowujące wartość notatki
           newNoteTitle = '';
@@ -86,7 +87,7 @@ class _MainLayoutState extends State<MainLayout> {
           // Odśwież listę notatek
           setState(() {});
         } else {
-          print('Błąd podczas zapisywania notatek do pliku.');
+          // print('Błąd podczas zapisywania notatek do pliku.');
         }
       });
     }
@@ -134,8 +135,14 @@ class _MainLayoutState extends State<MainLayout> {
                         child: Container(
                           height: 110,
                           decoration: BoxDecoration(
+                            border: Border.all(color: const Color(0x2c6cddff), width: 0.3),
+                            gradient: const RadialGradient(
+                              radius: 2.7,
+                              center: Alignment.bottomRight,
+                              colors: [Color(0xff66d6ff), Color(0xB2385A7C)],
+                            ),
                             borderRadius: BorderRadius.circular(37),
-                            color: Color.fromRGBO(217, 217, 217, 0.161),
+                            color: const Color.fromRGBO(217, 217, 217, 0.161),
                           ),
                           child: Row(
                             children: [
@@ -149,7 +156,7 @@ class _MainLayoutState extends State<MainLayout> {
                               ),
                               Expanded(
                                 child: ConstrainedBox(
-                                  constraints: BoxConstraints(maxWidth: 280), // Ustawienie maksymalnej szerokości
+                                  constraints: const BoxConstraints(maxWidth: 280), // Ustawienie maksymalnej szerokości
                                   child: Padding(
                                     padding: const EdgeInsets.only(top: 12.0, bottom: 12.0, right: 12.0),
                                     child: Column(
@@ -157,7 +164,7 @@ class _MainLayoutState extends State<MainLayout> {
                                       children: [
                                         Text(
                                           note.title,
-                                          style: TextStyle(
+                                          style: const TextStyle(
                                             color: Colors.white,
                                             fontFamily: 'Roboto Mono',
                                             fontSize: 15,
@@ -168,11 +175,11 @@ class _MainLayoutState extends State<MainLayout> {
                                           maxLines: 1,
                                           overflow: TextOverflow.ellipsis,
                                         ),
-                                        SizedBox(height: 8),
+                                        const SizedBox(height: 8),
                                         Expanded(
                                           child: Text(
                                             note.text,
-                                            style: TextStyle(
+                                            style: const TextStyle(
                                               color: Colors.white,
                                               fontFamily: 'Roboto Mono',
                                               fontSize: 12,
@@ -193,7 +200,7 @@ class _MainLayoutState extends State<MainLayout> {
                                 onTap: () {
                                   onNoteDismissed(_notes.indexOf(note));
                                 },
-                                child: Container(
+                                child: SizedBox(
                                   width: 40,
                                   height: 24,
                                   child: Image.asset(
@@ -222,8 +229,8 @@ class _MainLayoutState extends State<MainLayout> {
                             begin: Alignment.bottomRight,
                             end: Alignment.centerLeft,
                             colors: [
-                              Color(0xFFffffff).withOpacity(0.15),
-                              Color(0xFFFFFFFF).withOpacity(0.05),
+                              const Color(0xFFffffff).withOpacity(0.15),
+                              const Color(0xFFFFFFFF).withOpacity(0.05),
                             ],
                             stops: [
                               0.1,
@@ -233,8 +240,8 @@ class _MainLayoutState extends State<MainLayout> {
                           begin: Alignment.centerRight,
                           end: Alignment.bottomLeft,
                           colors: [
-                            Color(0xB4DDEA).withOpacity(0.8),
-                            Color((0xB4DDEA)).withOpacity(0),
+                            const Color(0xB4DDEA).withOpacity(0.8),
+                            const Color((0xB4DDEA)).withOpacity(0),
                           ],
                         ),
                         child: Column(
@@ -249,14 +256,14 @@ class _MainLayoutState extends State<MainLayout> {
                                   });
                                 },
                                 maxLength: 30,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   color: Colors.white, // Biały kolor tekstu
                                   fontFamily: 'Roboto Mono',
                                   fontSize: 24, // Zwiększona wielkość czcionki
                                   fontWeight: FontWeight.normal,
                                   height: 1,
                                 ),
-                                decoration: InputDecoration(
+                                decoration: const InputDecoration(
                                   hintText: 'Title',
                                   hintStyle: TextStyle(
                                     color: Colors.white, // Biały kolor tekstu sugerującego
@@ -282,7 +289,7 @@ class _MainLayoutState extends State<MainLayout> {
                                 buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) {
                                   return Text(
                                     '$currentLength / $maxLength',
-                                    style: TextStyle(
+                                    style: const TextStyle(
                                       color: Colors.white, // Biały kolor tekstu liczby znaków
                                       fontFamily: 'Roboto Mono',
                                       fontSize: 11,
@@ -293,10 +300,10 @@ class _MainLayoutState extends State<MainLayout> {
                                 },
                               ),
                             ),
-                            SizedBox(height: 11),
+                            const SizedBox(height: 11),
                             Padding(
                               padding: const EdgeInsets.only(left: 25, right: 25),
-                              child: Container(
+                              child: SizedBox(
                                 height: 380,
                                 child: TextFormField(
                                   onChanged: (value) {
@@ -305,14 +312,14 @@ class _MainLayoutState extends State<MainLayout> {
                                     });
                                   },
                                   maxLines: null,
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                     color: Colors.white, // Biały kolor tekstu
                                     fontFamily: 'Roboto Mono',
                                     fontSize: 16,
                                     fontWeight: FontWeight.normal,
                                     height: 1,
                                   ),
-                                  decoration: InputDecoration(
+                                  decoration: const InputDecoration(
                                     hintText: 'Start writing your note',
                                     hintStyle: TextStyle(
                                       color: Colors.white, // Biały kolor tekstu sugerującego
@@ -374,7 +381,7 @@ class ActionButton extends StatefulWidget {
   final bool isOnNoteEdit;
   final Function(bool) onNoteAdded;
 
-  ActionButton({required this.isOnNoteEdit, required this.onNoteAdded});
+  const ActionButton({super.key, required this.isOnNoteEdit, required this.onNoteAdded});
 
   @override
   _ActionButtonState createState() => _ActionButtonState();
@@ -387,13 +394,13 @@ class _ActionButtonState extends State<ActionButton> {
       onTap: () {
         if (widget.isOnNoteEdit) {
           // Dodaj nową notatkę tylko w trybie edycji
-          widget.onNoteAdded(newNoteTitle.isNotEmpty && newNoteText.isNotEmpty);;
+          widget.onNoteAdded(newNoteTitle.isNotEmpty && newNoteText.isNotEmpty);
         } else {
           // Przełącz tryb edycji
           widget.onNoteAdded(false);
         }
       },
-      child: Container(
+      child: SizedBox(
         width: 75,
         height: 75,
         child: Stack(
@@ -401,7 +408,7 @@ class _ActionButtonState extends State<ActionButton> {
             Container(
               width: 75,
               height: 75,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 boxShadow: [
                   BoxShadow(
                     color: Color.fromRGBO(163, 154, 196, 0.8999999761581421),
@@ -449,7 +456,10 @@ class _ActionButtonState extends State<ActionButton> {
   }
 }
 
+
 class NoteEdit extends StatefulWidget {
+  const NoteEdit({super.key});
+
   @override
   _NoteEditState createState() => _NoteEditState();
 }
@@ -459,46 +469,132 @@ class _NoteEditState extends State<NoteEdit> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      height: 380,
-      child: TextFormField(
-        onChanged: (value) {
-          setState(() {
-            newNoteText = value;
-          });
-        },
-        maxLines: null,
-        style: TextStyle(
-          color: Colors.white,
-          fontFamily: 'Roboto Mono',
-          fontSize: 16,
-          fontWeight: FontWeight.normal,
-          height: 1,
-        ),
-        decoration: InputDecoration(
-          hintText: 'Start writing your note',
-          hintStyle: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Roboto Mono',
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-            height: 1,
-          ),
-          alignLabelWithHint: true,
-          labelStyle: TextStyle(
-            color: Colors.white,
-            fontFamily: 'Roboto Mono',
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-            height: 1,
-          ),
-          enabledBorder: UnderlineInputBorder(
-            borderSide: BorderSide(
-              color: Colors.transparent,
-              width: 0,
+    return GlassmorphicContainer(
+      width: 315,
+      height: 510,
+      borderRadius: 40,
+      blur: 7,
+      alignment: Alignment.bottomCenter,
+      border: 2,
+      linearGradient: LinearGradient(
+          begin: Alignment.bottomRight,
+          end: Alignment.centerLeft,
+          colors: [
+            const Color(0xFFffffff).withOpacity(0.15),
+            const Color(0xFFFFFFFF).withOpacity(0.05),
+          ],
+          stops: const [0.1, 1,]),
+      borderGradient: LinearGradient(
+        begin: Alignment.centerRight,
+        end: Alignment.bottomLeft,
+        colors: [
+          const Color(0xB4DDEA).withOpacity(0.8),
+          const Color((0xB4DDEA)).withOpacity(0),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.only(left: 25, top: 10, right: 25),
+            child: TextFormField(
+              onChanged: (value) {
+                setState(() {
+                  newNoteTitle = value;
+                });
+              },
+              maxLength: 30,
+              style: const TextStyle(
+                color: Colors.white, // Biały kolor tekstu
+                fontFamily: 'Roboto Mono',
+                fontSize: 24, // Zwiększona wielkość czcionki
+                fontWeight: FontWeight.normal,
+                height: 1,
+              ),
+              decoration: const InputDecoration(
+                hintText: 'Title',
+                hintStyle: TextStyle(
+                  color: Colors.white, // Biały kolor tekstu sugerującego
+                  fontFamily: 'Roboto Mono',
+                  fontSize: 28, // Zwiększona wielkość czcionki
+                  fontWeight: FontWeight.normal,
+                  height: 1,
+                ),
+                labelStyle: TextStyle(
+                  color: Colors.white,
+                  fontFamily: 'Roboto Mono',
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  height: 1,
+                ),
+                enabledBorder: UnderlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromRGBO(101, 151, 201, 1),
+                    width: 1,
+                  ),
+                ),
+              ),
+              buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) {
+                return Text(
+                  '$currentLength / $maxLength',
+                  style: const TextStyle(
+                    color: Colors.white, // Biały kolor tekstu liczby znaków
+                    fontFamily: 'Roboto Mono',
+                    fontSize: 11,
+                    fontWeight: FontWeight.normal,
+                    height: 1,
+                  ),
+                );
+              },
             ),
           ),
-        ),
+          const SizedBox(height: 11),
+          Padding(
+            padding: const EdgeInsets.only(left: 25, right: 25),
+            child: SizedBox(
+              height: 380,
+              child: TextFormField(
+                onChanged: (value) {
+                  setState(() {
+                    newNoteText = value;
+                  });
+                },
+                maxLines: null,
+                style: const TextStyle(
+                  color: Colors.white, // Biały kolor tekstu
+                  fontFamily: 'Roboto Mono',
+                  fontSize: 16,
+                  fontWeight: FontWeight.normal,
+                  height: 1,
+                ),
+                decoration: const InputDecoration(
+                  hintText: 'Start writing your note',
+                  hintStyle: TextStyle(
+                    color: Colors.white, // Biały kolor tekstu sugerującego
+                    fontFamily: 'Roboto Mono',
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    height: 1,
+                  ),
+                  alignLabelWithHint: true,
+                  labelStyle: TextStyle(
+                    color: Colors.white,
+                    fontFamily: 'Roboto Mono',
+                    fontSize: 16,
+                    fontWeight: FontWeight.normal,
+                    height: 1,
+                  ),
+                  enabledBorder: UnderlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Colors.transparent, // Usunięcie podkreślenia pola tekstowego
+                      width: 0,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
