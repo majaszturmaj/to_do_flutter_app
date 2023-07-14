@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../classes/Note.dart';
 
@@ -73,6 +74,14 @@ class _NoteListWidgetState extends State<NoteListWidget> {
     });
   }
 
+  void onNoteDismissed(int index) {
+    setState(() {
+      _notes.removeAt(index);
+      noteManager.deleteNote(index); // Usuń notatkę z pliku JSON
+    });
+  }
+
+
   @override
   void initState() {
     super.initState();
@@ -83,6 +92,7 @@ class _NoteListWidgetState extends State<NoteListWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF022A50),
       body: Padding(
         padding: const EdgeInsets.all(25),
         child: Column(
@@ -93,27 +103,82 @@ class _NoteListWidgetState extends State<NoteListWidget> {
                   ListView.builder(
                     itemCount: _notes.length,
                     itemBuilder: (context, index) {
-                      final note = _notes[index];
+                      final note = _notes.reversed.toList()[index];
 
-                      return Dismissible(
-                        key: UniqueKey(),
-                        onDismissed: (direction) {
-                          setState(() {
-                            _notes.removeAt(index);
-                          });
-                        },
-                        background: Container(
-                          color: Colors.red,
-                          alignment: Alignment.centerLeft,
-                          padding: EdgeInsets.only(left: 16),
-                          child: Icon(Icons.delete, color: Colors.white),
-                        ),
-                        child: Card(
-                          margin: const EdgeInsets.all(10),
-                          color: Colors.amber.shade100,
-                          child: ListTile(
-                            title: Text(note.title),
-                            subtitle: Text(note.text),
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                        child: Container(
+                          height: 110,
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(37),
+                            color: Color.fromRGBO(217, 217, 217, 0.161),
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(8.0),
+                                child: SvgPicture.asset(
+                                  'assets/images/notegradient.svg',
+                                  semanticsLabel: 'notegradient',
+                                  height: 95, // Dodano wysokość dla poprawnego wyświetlania SVG
+                                ),
+                              ),
+                              Expanded(
+                                child: Padding(
+                                  padding: const EdgeInsets.only(top: 12.0, bottom: 12.0, right: 12.0),
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        note.title,
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontFamily: 'Roboto Mono',
+                                          fontSize: 15,
+                                          letterSpacing: 0,
+                                          fontWeight: FontWeight.normal,
+                                          height: 1,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      SizedBox(height: 8),
+                                      Expanded(
+                                        child: Text(
+                                          note.text,
+                                          style: TextStyle(
+                                            color: Colors.white,
+                                            fontFamily: 'Roboto Mono',
+                                            fontSize: 12,
+                                            letterSpacing: 0,
+                                            fontWeight: FontWeight.normal,
+                                            height: 1,
+                                          ),
+                                          maxLines: 4,
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              GestureDetector(
+                                onTap: () {
+                                  onNoteDismissed(_notes.indexOf(note));
+                                },
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    border: Border.all(color: Colors.white), // Dodano obramowanie
+                                  ),
+                                  child: Image.asset(
+                                    'assets/images/Close.png',
+                                    fit: BoxFit.fitWidth,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       );
