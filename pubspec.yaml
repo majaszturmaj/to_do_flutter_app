@@ -35,6 +35,7 @@ dependencies:
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
+  glassmorphism:
   flutter_svg:
 
 dev_dependencies:
@@ -64,6 +65,8 @@ flutter:
     - lib/assets/images/save.png
     - lib/assets/images/plusmath.png
     - lib/assets/notes.json
+    - lib/assets/images/close.png
+    - lib/assets/images/notegradient.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
