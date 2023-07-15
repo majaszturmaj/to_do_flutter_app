@@ -44,7 +44,7 @@ class _MainLayoutState extends State<MainLayout> {
   void addNote() {
     setState(() {
       noteManager.addNote();
-      toggleAddingNote(); // zamknij pole do wpisywania nowej notatki
+      toggleAddingNote();
     });
     }
 
@@ -75,7 +75,7 @@ class _MainLayoutState extends State<MainLayout> {
                   if (isAddingNote)
                     Align(
                       alignment: Alignment.center,
-                      child: NoteEdit(noteManager: noteManager,)
+                      child: NoteEdit(noteManager: noteManager)
                     ),
                 ],
               ),

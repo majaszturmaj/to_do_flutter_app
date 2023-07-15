@@ -66,6 +66,7 @@ class NoteManager {
   void addNote() {
     if (isNoteNotEmpty()) {
       Note note = Note(_newNoteTitle, _newNoteText);
+      clearNote();
       _notes.add(note);
       saveNotesToFile();
     }
