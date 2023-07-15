@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'dart:convert';
 import 'package:glassmorphism/glassmorphism.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 
-import '../classes/NoteManager.dart';
+import '../classes/note_manager.dart';
 
 void main() {
   runApp(const MyApp());
@@ -17,20 +15,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'To Do',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
       home: const MainLayout(),
     );
   }
 }
-
-
-
-String newNoteTitle = '';
-String newNoteText = '';
 
 class MainLayout extends StatefulWidget {
   const MainLayout({super.key});
@@ -40,78 +32,31 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> {
-  List _notes = [];
   bool isAddingNote = false;
-
-  NoteManager noteManager = NoteManager("lib/assets/notes.json");
-
-  // Fetch content from the json file
-  Future<void> readJson() async {
-    final String response = await rootBundle.loadString(
-        'lib/assets/notes.json');
-    final data = await json.decode(response);
-
-    if (data is List) {
-      setState(() {
-        _notes = data.map((json) => Note.fromJson(json)).toList();
-      });
-    } else {
-      // print(
-      //     'Nieprawidłowy format danych JSON. Oczekiwano listy obiektów "notes".');
-    }
-  }
-
-  void toggleAddingNote() {
-    setState(() {
-      isAddingNote = !isAddingNote;
-    });
-  }
-
-  void addNote() {
-    if (newNoteTitle.isNotEmpty && newNoteText.isNotEmpty) {
-      noteManager.addNote(newNoteTitle,
-          newNoteText); // Dodaj nową notatkę do listy w NoteManager
-
-      // Zapisz notatki do pliku JSON
-      noteManager.saveNotesToFile().then((success) {
-        if (success) {
-          // print('Dodano nową notatkę: Tytuł=$newNoteTitle, Treść=$newNoteText');
-
-          // Wyczyść zmienne przechowujące wartość notatki
-          newNoteTitle = '';
-          newNoteText = '';
-
-          // Zamknij pole wprowadzania notatki
-          toggleAddingNote();
-
-          // Odśwież listę notatek
-          setState(() {});
-        } else {
-          // print('Błąd podczas zapisywania notatek do pliku.');
-        }
-      });
-    }
-  }
-
-  void onNoteAdded(String title, String text) {
-    setState(() {
-      _notes.add(Note(title, text));
-    });
-  }
-
-  void onNoteDismissed(int index) {
-    setState(() {
-      _notes.removeAt(index);
-      noteManager.deleteNote(index); // Usuń notatkę z pliku JSON
-    });
-  }
-
+  NoteManager noteManager = NoteManager();
 
   @override
   void initState() {
     super.initState();
-    // Call the readJson method when the app starts
-    readJson();
+  }
+
+  void addNote() {
+    setState(() {
+      noteManager.addNote();
+      toggleAddingNote(); // zamknij pole do wpisywania nowej notatki
+    });
+    }
+
+  void deleteNote(int index) {
+    setState(() {
+      noteManager.deleteNote(index);
+    });
+  }
+
+  void toggleAddingNote() { // przełącza pole do wpisywania nowej notatki
+    setState(() {
+      isAddingNote = !isAddingNote;
+    });
   }
 
   @override
@@ -125,230 +70,11 @@ class _MainLayoutState extends State<MainLayout> {
             Expanded(
               child: Stack(
                 children: [
-                  ListView.builder(
-                    itemCount: _notes.length,
-                    itemBuilder: (context, index) {
-                      final note = _notes.reversed.toList()[index];
-
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-                        child: Container(
-                          height: 110,
-                          decoration: BoxDecoration(
-                            border: Border.all(color: const Color(0x2c6cddff), width: 0.3),
-                            gradient: const RadialGradient(
-                              radius: 2.7,
-                              center: Alignment.bottomRight,
-                              colors: [Color(0xff66d6ff), Color(0xB2385A7C)],
-                            ),
-                            borderRadius: BorderRadius.circular(37),
-                            color: const Color.fromRGBO(217, 217, 217, 0.161),
-                          ),
-                          child: Row(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: SvgPicture.asset(
-                                  'lib/assets/images/notegradient.svg',
-                                  semanticsLabel: 'notegradient',
-                                  height: 95, // Dodano wysokość dla poprawnego wyświetlania SVG
-                                ),
-                              ),
-                              Expanded(
-                                child: ConstrainedBox(
-                                  constraints: const BoxConstraints(maxWidth: 280), // Ustawienie maksymalnej szerokości
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(top: 12.0, bottom: 12.0, right: 12.0),
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          note.title,
-                                          style: const TextStyle(
-                                            color: Colors.white,
-                                            fontFamily: 'Roboto Mono',
-                                            fontSize: 15,
-                                            letterSpacing: 0,
-                                            fontWeight: FontWeight.normal,
-                                            height: 1,
-                                          ),
-                                          maxLines: 1,
-                                          overflow: TextOverflow.ellipsis,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Expanded(
-                                          child: Text(
-                                            note.text,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontFamily: 'Roboto Mono',
-                                              fontSize: 12,
-                                              letterSpacing: 0,
-                                              fontWeight: FontWeight.normal,
-                                              height: 1,
-                                            ),
-                                            maxLines: 4,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              GestureDetector(
-                                onTap: () {
-                                  onNoteDismissed(_notes.indexOf(note));
-                                },
-                                child: SizedBox(
-                                  width: 40,
-                                  height: 24,
-                                  child: Image.asset(
-                                    'lib/assets/images/close.png',
-                                    fit: BoxFit.fitHeight,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    },
-                  ),
+                  NoteListView(noteManager: noteManager, deleteNote: deleteNote),
                   if (isAddingNote)
                     Align(
                       alignment: Alignment.center,
-                      child: GlassmorphicContainer(
-                        width: 315,
-                        height: 510,
-                        borderRadius: 40,
-                        blur: 7,
-                        alignment: Alignment.bottomCenter,
-                        border: 2,
-                        linearGradient: LinearGradient(
-                            begin: Alignment.bottomRight,
-                            end: Alignment.centerLeft,
-                            colors: [
-                              const Color(0xFFffffff).withOpacity(0.15),
-                              const Color(0xFFFFFFFF).withOpacity(0.05),
-                            ],
-                            stops: [
-                              0.1,
-                              1,
-                            ]),
-                        borderGradient: LinearGradient(
-                          begin: Alignment.centerRight,
-                          end: Alignment.bottomLeft,
-                          colors: [
-                            const Color(0xB4DDEA).withOpacity(0.8),
-                            const Color((0xB4DDEA)).withOpacity(0),
-                          ],
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Padding(
-                              padding: const EdgeInsets.only(left: 25, top: 10, right: 25),
-                              child: TextFormField(
-                                onChanged: (value) {
-                                  setState(() {
-                                    newNoteTitle = value;
-                                  });
-                                },
-                                maxLength: 30,
-                                style: const TextStyle(
-                                  color: Colors.white, // Biały kolor tekstu
-                                  fontFamily: 'Roboto Mono',
-                                  fontSize: 24, // Zwiększona wielkość czcionki
-                                  fontWeight: FontWeight.normal,
-                                  height: 1,
-                                ),
-                                decoration: const InputDecoration(
-                                  hintText: 'Title',
-                                  hintStyle: TextStyle(
-                                    color: Colors.white, // Biały kolor tekstu sugerującego
-                                    fontFamily: 'Roboto Mono',
-                                    fontSize: 28, // Zwiększona wielkość czcionki
-                                    fontWeight: FontWeight.normal,
-                                    height: 1,
-                                  ),
-                                  labelStyle: TextStyle(
-                                    color: Colors.white,
-                                    fontFamily: 'Roboto Mono',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.normal,
-                                    height: 1,
-                                  ),
-                                  enabledBorder: UnderlineInputBorder(
-                                    borderSide: BorderSide(
-                                      color: Color.fromRGBO(101, 151, 201, 1),
-                                      width: 1,
-                                    ),
-                                  ),
-                                ),
-                                buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) {
-                                  return Text(
-                                    '$currentLength / $maxLength',
-                                    style: const TextStyle(
-                                      color: Colors.white, // Biały kolor tekstu liczby znaków
-                                      fontFamily: 'Roboto Mono',
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.normal,
-                                      height: 1,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 11),
-                            Padding(
-                              padding: const EdgeInsets.only(left: 25, right: 25),
-                              child: SizedBox(
-                                height: 380,
-                                child: TextFormField(
-                                  onChanged: (value) {
-                                    setState(() {
-                                      newNoteText = value;
-                                    });
-                                  },
-                                  maxLines: null,
-                                  style: const TextStyle(
-                                    color: Colors.white, // Biały kolor tekstu
-                                    fontFamily: 'Roboto Mono',
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.normal,
-                                    height: 1,
-                                  ),
-                                  decoration: const InputDecoration(
-                                    hintText: 'Start writing your note',
-                                    hintStyle: TextStyle(
-                                      color: Colors.white, // Biały kolor tekstu sugerującego
-                                      fontFamily: 'Roboto Mono',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.normal,
-                                      height: 1,
-                                    ),
-                                    alignLabelWithHint: true,
-                                    labelStyle: TextStyle(
-                                      color: Colors.white,
-                                      fontFamily: 'Roboto Mono',
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.normal,
-                                      height: 1,
-                                    ),
-                                    enabledBorder: UnderlineInputBorder(
-                                      borderSide: BorderSide(
-                                        color: Colors.transparent, // Usunięcie podkreślenia pola tekstowego
-                                        width: 0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: NoteEdit(noteManager: noteManager,)
                     ),
                 ],
               ),
@@ -361,7 +87,6 @@ class _MainLayoutState extends State<MainLayout> {
                   isOnNoteEdit: isAddingNote,
                   onNoteAdded: (isNoteAdded) {
                     if (isNoteAdded) {
-                      onNoteAdded(newNoteTitle, newNoteText);
                       addNote();
                     } else {
                       toggleAddingNote();
@@ -393,8 +118,7 @@ class _ActionButtonState extends State<ActionButton> {
     return GestureDetector(
       onTap: () {
         if (widget.isOnNoteEdit) {
-          // Dodaj nową notatkę tylko w trybie edycji
-          widget.onNoteAdded(newNoteTitle.isNotEmpty && newNoteText.isNotEmpty);
+          widget.onNoteAdded(true);
         } else {
           // Przełącz tryb edycji
           widget.onNoteAdded(false);
@@ -457,15 +181,10 @@ class _ActionButtonState extends State<ActionButton> {
 }
 
 
-class NoteEdit extends StatefulWidget {
-  const NoteEdit({super.key});
+class NoteEdit extends StatelessWidget {
+  final NoteManager noteManager;
 
-  @override
-  _NoteEditState createState() => _NoteEditState();
-}
-
-class _NoteEditState extends State<NoteEdit> {
-  String newNoteText = '';
+  const NoteEdit({super.key, required this.noteManager});
 
   @override
   Widget build(BuildContext context) {
@@ -499,24 +218,22 @@ class _NoteEditState extends State<NoteEdit> {
             padding: const EdgeInsets.only(left: 25, top: 10, right: 25),
             child: TextFormField(
               onChanged: (value) {
-                setState(() {
-                  newNoteTitle = value;
-                });
+                noteManager.setNewNoteTitle(value);
               },
               maxLength: 30,
               style: const TextStyle(
-                color: Colors.white, // Biały kolor tekstu
+                color: Colors.white,
                 fontFamily: 'Roboto Mono',
-                fontSize: 24, // Zwiększona wielkość czcionki
+                fontSize: 24,
                 fontWeight: FontWeight.normal,
                 height: 1,
               ),
               decoration: const InputDecoration(
                 hintText: 'Title',
                 hintStyle: TextStyle(
-                  color: Colors.white, // Biały kolor tekstu sugerującego
+                  color: Colors.white,
                   fontFamily: 'Roboto Mono',
-                  fontSize: 28, // Zwiększona wielkość czcionki
+                  fontSize: 28,
                   fontWeight: FontWeight.normal,
                   height: 1,
                 ),
@@ -535,10 +252,10 @@ class _NoteEditState extends State<NoteEdit> {
                 ),
               ),
               buildCounter: (BuildContext context, { int? currentLength, int? maxLength, bool? isFocused }) {
-                return Text(
+                return Text( // liczba użytych znaków na 30 dostępnych
                   '$currentLength / $maxLength',
                   style: const TextStyle(
-                    color: Colors.white, // Biały kolor tekstu liczby znaków
+                    color: Colors.white,
                     fontFamily: 'Roboto Mono',
                     fontSize: 11,
                     fontWeight: FontWeight.normal,
@@ -555,9 +272,7 @@ class _NoteEditState extends State<NoteEdit> {
               height: 380,
               child: TextFormField(
                 onChanged: (value) {
-                  setState(() {
-                    newNoteText = value;
-                  });
+                    noteManager.setNewNoteText(value);
                 },
                 maxLines: null,
                 style: const TextStyle(
@@ -596,6 +311,98 @@ class _NoteEditState extends State<NoteEdit> {
           ),
         ],
       ),
+    );
+  }
+}
+
+class NoteListView extends StatelessWidget {
+  final NoteManager noteManager;
+  final void Function(int) deleteNote;
+
+  const NoteListView({super.key, required this.noteManager, required this.deleteNote});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: noteManager.getLength(),
+      itemBuilder: (context, index) {
+        final note = noteManager.getReversedNote(index);
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+          child: Container(
+            height: 110,
+            decoration: BoxDecoration(
+              border: Border.all(color: const Color(0x2c6cddff), width: 0.3),
+              gradient: const RadialGradient(
+                radius: 2.7,
+                center: Alignment.bottomRight,
+                colors: [Color(0xff66d6ff), Color(0xB2385A7C)],
+              ),
+              borderRadius: BorderRadius.circular(37),
+              color: const Color.fromRGBO(217, 217, 217, 0.161),
+            ),
+            child: Row(
+              children: [
+                const Padding(
+                  padding: EdgeInsets.all(8.0),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: 12.0, bottom: 12.0, right: 12.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          note.title,
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontFamily: 'Roboto Mono',
+                            fontSize: 15,
+                            letterSpacing: 0,
+                            fontWeight: FontWeight.normal,
+                            height: 1,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        const SizedBox(height: 8),
+                        Expanded(
+                          child: Text(
+                            note.text,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontFamily: 'Roboto Mono',
+                              fontSize: 12,
+                              letterSpacing: 0,
+                              fontWeight: FontWeight.normal,
+                              height: 1,
+                            ),
+                            maxLines: 4,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                GestureDetector(
+                  onTap: () {
+                    deleteNote(noteManager.getIndex(note));
+                  },
+                  child: SizedBox(
+                    width: 40,
+                    height: 24,
+                    child: Image.asset(
+                      'lib/assets/images/close.png',
+                      fit: BoxFit.fitHeight,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
     );
   }
 }
