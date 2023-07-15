@@ -66,6 +66,11 @@ class NoteManager {
     else return false;
   }
 
+  bool isListNotEmpty(){
+    if (_notes.isNotEmpty) return true;
+    else return false;
+  }
+
   void addNote() {
     if (isNoteNotEmpty()) {
       Note note = Note(_newNoteTitle, _newNoteText);

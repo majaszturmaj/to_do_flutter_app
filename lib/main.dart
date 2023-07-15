@@ -76,11 +76,24 @@ class _MainLayoutState extends State<MainLayout> {
             Expanded(
               child: Stack(
                 children: [
-                  NoteListView(noteManager: noteManager, deleteNote: deleteNote),
+                  if (noteManager.isListNotEmpty())
+                    NoteListView(noteManager: noteManager, deleteNote: deleteNote),
+                  if (!noteManager.isListNotEmpty()) // Show centered message if there are no notes
+                    Center(
+                      child: Text(
+                        'No notes here: add one by clicking "+" button',
+                        style: TextStyle(
+                          color: Color(0xFF337397),
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                        textAlign: TextAlign.center,
+                      ),
+                    ),
                   if (isAddingNote)
                     Align(
                       alignment: Alignment.center,
-                      child: NoteEdit(noteManager: noteManager)
+                      child: NoteEdit(noteManager: noteManager),
                     ),
                 ],
               ),
@@ -105,5 +118,4 @@ class _MainLayoutState extends State<MainLayout> {
         ),
       ),
     );
-  }
-}
+  }}
