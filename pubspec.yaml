@@ -37,6 +37,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   glassmorphism:
   flutter_svg:
+  path_provider:
 
 dev_dependencies:
   flutter_test:
@@ -64,7 +65,6 @@ flutter:
   assets:
     - lib/assets/images/save.png
     - lib/assets/images/plusmath.png
-    - lib/assets/notes.json
     - lib/assets/images/close.png
 
   # An image asset can refer to one or more resolution-specific "variants", see

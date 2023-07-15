@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:flutter/services.dart' show rootBundle;
+import 'package:path_provider/path_provider.dart';
 
 class Note {
   String title = "";
@@ -25,13 +25,16 @@ class Note {
 
 class NoteManager {
   List<Note> _notes;
-  final String _fileName = "lib/assets/notes.json";
+  //final String _fileName = "lib/assets/notes.json";
   String _newNoteTitle = "";
   String _newNoteText = "";
 
-  NoteManager() : _notes = <Note>[] {
-    loadNotesFromFile();
+  Future<File> get _directoryPath async {
+    Directory directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/notes.json');
   }
+
+  NoteManager() : _notes = <Note>[];
 
   int getLength() {
     return _notes.length;
@@ -81,7 +84,7 @@ class NoteManager {
 
   Future<bool> saveNotesToFile() async {
     try {
-      File file = File(_fileName);
+      File file = await _directoryPath;
       List<Map<String, dynamic>> jsonList = _notes.map((note) => note.toJson()).toList();
       String jsonString = jsonEncode(jsonList);
       await file.writeAsString(jsonString);
@@ -92,12 +95,8 @@ class NoteManager {
     }
   }
 
-  void loadNotesFromFile() {
-    File file = File(_fileName);
-    if (!file.existsSync()) {
-      //print('Plik $_fileName nie istnieje.');
-      return;
-    }
+  Future<void> loadNotesFromFile() async {
+    File file = await _directoryPath;
     String jsonString = file.readAsStringSync();
     List<dynamic> jsonList = jsonDecode(jsonString);
     _notes = jsonList.map((json) => Note.fromJson(json)).toList();
