@@ -8,18 +8,14 @@ My UI project made with Figma:
 *On bigger screen (running on for example Windows or desktop browser) it should look like this:*
 ![mainwithnotes_big2](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/c5b9c331-8a8d-4c2d-920b-3e3eb9ac617d)
 
-How it actually look when it is done:
+And how it actually look (on android device):
 
-![image](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/5b4e2c61-1baf-4a7b-8df8-7d7768e9d2ea)
+![ss_no_notes](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/696e34d8-c1b4-4f69-9903-689458c8b947)
 
-![image](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/7270e39c-f923-43f8-92a5-437ac7a5c397)
+![ss_one_note](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/f889c236-31f2-47dc-ae5b-94838ab4ab8d)
 
-![image](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/9d0c70c4-e148-4b28-aa3e-4b1be5ede222)
+![ss_new_note_empty](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/8bee656c-70e6-4611-8845-cce23f5fa06d)
 
-.. and on android:
+![ss_new_note](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/91209db4-0ccf-445a-8891-289f9ab85569)
 
-![357302963_630073422518442_7486721459503613521_n](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/622d7da4-6d93-42de-aaef-64fe5cc0dc5e) ![357299707_6676664412415109_2171891376437705337_n](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/472ccc72-b33b-4178-82ba-87e271c9f977) ![356959497_219665457297319_4576298548414665550_n](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/4abc1ee2-b316-40c5-b487-db6d88900577) ![356940435_853449686366675_5270805876692065848_n](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/d3fce111-6013-479f-914e-78f467cc29e1) ![359943864_307303491727961_1905234352144590419_n](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/250d6595-ba3b-40b5-9a7b-7a1786e16e28)
-
-
-
-
+![ss_few_notes](https://github.com/majaszturmaj/to_do_flutter_app/assets/63556516/808e290f-d1c4-4c1d-a122-c829e381c63d)
